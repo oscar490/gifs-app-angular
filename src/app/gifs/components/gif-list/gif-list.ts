@@ -1,5 +1,6 @@
 import { Component, input, OnInit } from "@angular/core";
 import { GifListItem } from "./gif-list-item/gif-list-item";
+import { Gif } from "../../interfaces/gif.interface";
 
 
 @Component({
@@ -10,5 +11,5 @@ import { GifListItem } from "./gif-list-item/gif-list-item";
 
 export class GifList {
 
-  gifs = input.required<string[]>();
+  gifs = input.required<Gif[]>();
 }
