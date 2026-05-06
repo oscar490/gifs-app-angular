@@ -1,5 +1,7 @@
-import { Component } from "@angular/core";
+import { Gif } from './../../../interfaces/gif.interface';
+import { Component, inject } from "@angular/core";
 import { RouterLink, RouterModule } from "@angular/router";
+import { GifService } from 'src/app/gifs/services/gif.service';
 
 interface MainOption {
   label: string,
@@ -15,6 +17,8 @@ interface MainOption {
 })
 
 export class SideMainOptions {
+
+  gifService = inject(GifService);
 
   mainOptions: MainOption[] = [
     {
