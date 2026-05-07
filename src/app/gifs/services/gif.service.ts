@@ -6,6 +6,15 @@ import { Gif } from "../interfaces/gif.interface";
 import { GifMapper } from "../mapper/gif.mapper";
 import { map, Observable, tap } from "rxjs";
 
+const GIF_KEY = 'history';
+
+const loadFromLocalStorage = () => {
+  //  Record<string, Gif[]>
+  const gifsFromLocalStorage = localStorage.getItem(GIF_KEY) ?? '{}';
+
+  return JSON.parse(gifsFromLocalStorage);
+}
+
 @Injectable({providedIn: 'root'})
 export class GifService {
 
@@ -14,18 +23,29 @@ export class GifService {
   trendinGifs = signal<Gif[]>([]);
   trendingGifsLoading = signal(true);
 
-  searchHistory = signal<Record<string, Gif[]>>({});
+  trendingGifGroup = computed<Gif[][]>(() => {
+    const groups = [];
+
+    for (let i = 0; i < this.trendinGifs().length; i += 3) {
+      groups.push(this.trendinGifs().slice(i, i + 3));
+    }
+
+    console.log(groups);
+
+    return groups;
+  });
+
+  searchHistory = signal<Record<string, Gif[]>>(loadFromLocalStorage());
   searchHistoryKeys = computed(() => Object.keys(this.searchHistory()));
 
   constructor() {
     this.loadTrendingGifs();
-    this.loadSearchHistory();
   }
 
   saveGifsToLocalStorage = effect(() => {
     const historyString = JSON.stringify(this.searchHistory());
 
-    localStorage.setItem("history", historyString);
+    localStorage.setItem(GIF_KEY, historyString);
   })
 
   loadTrendingGifs() {
@@ -39,11 +59,6 @@ export class GifService {
       this.trendinGifs.set(gifs);
       this.trendingGifsLoading.set(false);
     })
-  }
-
-  loadSearchHistory(): void {
-    let history = JSON.parse(localStorage.getItem('history') ?? '') ?? {};
-    this.searchHistory.set(history);
   }
 
   searchGifs(query: string): Observable<Gif[]> {
